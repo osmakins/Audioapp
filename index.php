@@ -96,6 +96,68 @@
         <h1 class="h2">Dashboard</h1>
       </div>
       <h1>Upload and play music</h1>
-</body>
+      <div style="padding-left: 50px">
+	<form class="form-inline" action="upload.php" method="POST" enctype="multipart/form-data">
+		<div class="form-group">
+			<input type="file" name="audioFile" />
+		</div>
+		<div class="form-group">
+			<input type="submit" value="Upload Audio" name="save_audio">
+		</div>
+	</form>
+	</div>
+	<br>
+	<div class="col-md-10">
+	<table class="table table-bordered table-striped">
+	<thead>
+		<tr>
+			<th width="20">Track(s)</th>
+			<th>file Name</th>
+			<th>File Size (MB)</th>
+		</tr>
+	</thead>
+	<tbody>
+	<?php
+		$conn = mysqli_connect('localhost', 'root', 'Freefix', 'audiolibdb');
+		if(!$conn){
+			die('server not connected');
+		}
 
+		$query="select * from audios";
+
+		$r=mysqli_query($conn,$query);
+
+		$sum = 0;
+		$tracks = 0;
+
+    while($row=mysqli_fetch_array($r))
+		{
+		?>	
+		<tr>
+			<td><?php echo $row['id']; ++$tracks; ?></td>
+			<td><?php echo '<a href="play.php?name='.$row['filename'].'">'.$row['filename'].'</a>'?></td>
+			<td>
+				<?php 
+					$mb_size = round($row['filesize']/pow(1024, 2),2); 
+					echo $mb_size."MB"; 
+					$sum += $row['filesize'];
+					$mb_sum = round($sum/pow(1024, 2),2)
+				?>
+			</td>
+		</tr>
+		<?php
+    }
+		mysqli_close($conn);
+		
+		$available = 70 - $tracks;
+    $check_mb = isset($mb_sum) ? $mb_sum : "0";
+    echo $check_mb. "MB"." Used of 8000MB. " . " Approximately space for " . $available . " tracks available.";
+    
+		
+		?>				
+		</tbody>
+	</table>
+	</div>
+</main>
+</body>
 </html>
